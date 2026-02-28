@@ -225,7 +225,7 @@ func (s *ModelService) FetchFromProvider(provider *models.Provider) error {
 	req.Header.Set("Authorization", "Bearer "+provider.APIKey)
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := &http.Client{Timeout: 60 * time.Second} // 60s for model list fetch (local providers may be slow)
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to fetch models: %w", err)

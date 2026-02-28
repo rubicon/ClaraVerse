@@ -250,7 +250,7 @@ function AssistantMessageComponent({
   onVersionNavigate,
   onOpenArtifacts,
 }: AssistantMessageProps) {
-  const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+  const backendUrl = (window.__CLARA_CONFIG__?.API_BASE_URL ?? import.meta.env.VITE_API_BASE_URL) || '';
 
   // Sources modal state
   const [showSources, setShowSources] = useState(false);

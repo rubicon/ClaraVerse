@@ -8,6 +8,7 @@ export type SettingsTab =
   | 'api-keys'
   | 'credentials'
   | 'channels'
+  | 'devices'
   | 'usage'
   | 'privacy'
   | 'account';

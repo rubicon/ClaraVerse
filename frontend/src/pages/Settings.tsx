@@ -10,6 +10,7 @@ import {
   PrivacySection,
   AccountSection,
   PrivacyPolicySidebar,
+  DevicesSection,
 } from '@/components/settings';
 import type { SettingsTab } from '@/components/settings/SettingsLayout';
 import './Settings.css';
@@ -30,6 +31,7 @@ export const Settings = () => {
         'api-keys',
         'credentials',
         'channels',
+        'devices',
         'usage',
         'privacy',
         'account',
@@ -84,6 +86,13 @@ export const Settings = () => {
       {activeTab === 'channels' && (
         <section className="settings-section">
           <ChannelsSection />
+        </section>
+      )}
+
+      {/* Devices Tab */}
+      {activeTab === 'devices' && (
+        <section className="settings-section">
+          <DevicesSection />
         </section>
       )}
 

@@ -9,6 +9,7 @@ import {
   Home,
   MessageSquare,
   Radio,
+  Smartphone,
 } from 'lucide-react';
 import { Sidebar, type NavItem, type FooterLink } from '@/components/ui/Sidebar';
 import type { SettingsTab } from './SettingsLayout';
@@ -71,6 +72,13 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
       icon: Radio,
       isActive: activeTab === 'channels',
       onClick: () => onTabChange('channels'),
+    },
+    {
+      id: 'devices',
+      label: 'Devices',
+      icon: Smartphone,
+      isActive: activeTab === 'devices',
+      onClick: () => onTabChange('devices'),
     },
     {
       id: 'usage',

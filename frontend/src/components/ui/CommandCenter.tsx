@@ -998,9 +998,12 @@ export const CommandCenter = forwardRef<CommandCenterHandle, CommandCenterProps>
                                       );
                                     });
 
-                                    // Only show tiered/elite models in the quick dropdown
-                                    // All other models are accessible via "More models"
-                                    const displayModels = sortedTiered;
+                                    // Show tiered models in the quick dropdown, or fall back
+                                    // to first 5 models when no tiers are configured
+                                    const displayModels =
+                                      sortedTiered.length > 0
+                                        ? sortedTiered
+                                        : eligibleModels.slice(0, 5);
 
                                     return displayModels;
                                   })().map(model => (

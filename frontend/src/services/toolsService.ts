@@ -1,6 +1,7 @@
 import { apiClient } from '@/lib/apiClient';
+import { getApiBaseUrl } from '@/lib/config';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * JSON Schema parameter definition for a tool parameter

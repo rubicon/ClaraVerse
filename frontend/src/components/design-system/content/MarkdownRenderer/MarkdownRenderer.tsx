@@ -7,8 +7,9 @@ import { CodeBlock } from '../CodeBlock';
 import { cleanLLMOutput, cleanLLMOutputLight } from '@/utils';
 import { ImageGalleryModal, type GalleryImage } from '@/components/chat/ImageGalleryModal';
 import './MarkdownRenderer.css';
+import { getApiBaseUrl } from '@/lib/config';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const API_BASE_URL = getApiBaseUrl();
 
 // Language display aliases (like OpenAI uses short names)
 const LANGUAGE_ALIASES: Record<string, string> = {

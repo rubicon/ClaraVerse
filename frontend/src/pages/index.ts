@@ -15,3 +15,4 @@ export { PrivacyPolicy } from './PrivacyPolicy';
 export { Skills } from './Skills';
 export { SkillEditor } from './SkillEditor';
 export { Nexus } from './Nexus';
+export { DeviceAuth } from './DeviceAuth';

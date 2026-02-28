@@ -1,7 +1,8 @@
 import { apiClient } from '@/lib/apiClient';
 import type { Model, ModelsResponse } from '@/types/websocket';
+import { getApiBaseUrl } from '@/lib/config';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Fetch available models from the backend API

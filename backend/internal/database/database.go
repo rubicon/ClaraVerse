@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -42,6 +43,15 @@ func New(dsn string) (*DB, error) {
 			}
 		}
 
+		// Enable multi-statement execution for initial schema migration
+		if strings.Contains(dsn, "?") {
+			if !strings.Contains(dsn, "multiStatements") {
+				dsn += "&multiStatements=true"
+			}
+		} else {
+			dsn += "?multiStatements=true"
+		}
+
 		db, err = sql.Open("mysql", dsn)
 	} else {
 		// Legacy SQLite path (for backwards compatibility during migration)
@@ -68,18 +78,84 @@ func New(dsn string) (*DB, error) {
 }
 
 // Initialize creates all required tables
-// NOTE: MySQL schema is created via migrations/001_initial_schema.sql on first run
-// This function only runs additional migrations for schema evolution
+// On first run, applies the initial schema from migrations/001_initial_schema.sql
+// On subsequent runs, only runs incremental migrations for schema evolution
 func (db *DB) Initialize() error {
 	log.Println("🔍 Checking database schema...")
 
-	// Run migrations for existing databases
+	// Check if this is a fresh database (no schema_version table = first run)
+	if err := db.applyInitialSchemaIfNeeded(); err != nil {
+		return fmt.Errorf("failed to apply initial schema: %w", err)
+	}
+
+	// Run incremental migrations for existing databases
 	if err := db.runMigrations(); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
 	log.Println("✅ Database initialized successfully")
 	return nil
+}
+
+// applyInitialSchemaIfNeeded checks if the database has been initialized.
+// If not (fresh install), it applies the initial schema SQL migration.
+func (db *DB) applyInitialSchemaIfNeeded() error {
+	dbName := os.Getenv("MYSQL_DATABASE")
+	if dbName == "" {
+		dbName = "claraverse"
+	}
+
+	// Check if schema_version table exists (indicates schema was already applied)
+	var count int
+	query := `SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'schema_version'`
+	if err := db.QueryRow(query, dbName).Scan(&count); err != nil {
+		return fmt.Errorf("failed to check schema_version table: %w", err)
+	}
+	if count > 0 {
+		return nil // Schema already applied
+	}
+
+	// Find the migrations directory
+	migrationFile := db.findMigrationFile("001_initial_schema.sql")
+	if migrationFile == "" {
+		log.Println("⚠️  Initial schema migration file not found, skipping auto-apply")
+		return nil
+	}
+
+	log.Println("📦 First run detected - applying initial database schema...")
+
+	sqlBytes, err := os.ReadFile(migrationFile)
+	if err != nil {
+		return fmt.Errorf("failed to read migration file %s: %w", migrationFile, err)
+	}
+
+	if _, err := db.Exec(string(sqlBytes)); err != nil {
+		return fmt.Errorf("failed to execute initial schema migration: %w", err)
+	}
+
+	log.Println("✅ Initial database schema applied successfully")
+	return nil
+}
+
+// findMigrationFile locates a migration file by checking common paths
+func (db *DB) findMigrationFile(filename string) string {
+	candidates := []string{
+		filepath.Join("/app/migrations", filename),          // Docker
+		filepath.Join("migrations", filename),               // Development (from backend/)
+		filepath.Join("backend/migrations", filename),       // Development (from project root)
+	}
+
+	// Also check MIGRATIONS_DIR env var
+	if dir := os.Getenv("MIGRATIONS_DIR"); dir != "" {
+		candidates = append([]string{filepath.Join(dir, filename)}, candidates...)
+	}
+
+	for _, path := range candidates {
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+	return ""
 }
 
 // runMigrations runs database migrations for schema updates

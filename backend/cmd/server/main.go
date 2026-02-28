@@ -509,7 +509,9 @@ func main() {
 		log.Printf("⚠️  Warning: Could not load config from database: %v", err)
 	}
 
-	// Database starts empty - use admin UI to add providers and models
+	// Auto-discover local providers (Ollama, LM Studio) on host machine
+	localDiscovery := services.NewLocalProviderDiscovery(db, providerService, modelService, chatService)
+	go localDiscovery.StartBackgroundDiscovery(2 * time.Minute)
 
 	// Initialize health service for all provider capabilities (chat, vision, image, audio)
 	// Must be after provider sync so model aliases are available
@@ -561,9 +563,9 @@ func main() {
 	// Initialize Fiber app
 	app := fiber.New(fiber.Config{
 		AppName:        "ClaraVerse v1.0",
-		ReadTimeout:    360 * time.Second, // 6 minutes to handle long tool executions
-		WriteTimeout:   360 * time.Second, // 6 minutes to handle long tool executions
-		IdleTimeout:    360 * time.Second, // 6 minutes to handle long tool executions
+		ReadTimeout:    900 * time.Second, // 15 minutes — local models (Ollama) can take 5+ min to cold start
+		WriteTimeout:   900 * time.Second, // 15 minutes — streaming responses from large local models
+		IdleTimeout:    900 * time.Second, // 15 minutes — keep connections alive during long inference
 		BodyLimit:      50 * 1024 * 1024,  // 50MB limit for chat messages with images and large conversations
 		ReadBufferSize: 16384,             // 16KB for request headers (Brave/privacy browsers send extra headers)
 		UnescapePath:   true,              // Decode URL-encoded path parameters (e.g., %2F -> /)
@@ -596,11 +598,16 @@ func main() {
 		log.Println("⚠️  ALLOWED_ORIGINS not set, using development defaults")
 	}
 
+	// Fiber's CORS middleware does not allow AllowCredentials with wildcard origins.
+	// In all-in-one Docker mode (ALLOWED_ORIGINS=*), credentials aren't needed
+	// since the frontend is served from the same origin.
+	allowCredentials := allowedOrigins != "*"
+
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     allowedOrigins,
 		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
 		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
-		AllowCredentials: true,
+		AllowCredentials: allowCredentials,
 		// Skip CORS check for external access endpoints - they have their own permissive CORS
 		Next: func(c *fiber.Ctx) bool {
 			path := c.Path()
@@ -893,6 +900,20 @@ func main() {
 		log.Println("✅ Chat sync handler initialized")
 	}
 
+	// Initialize device service and handler (requires MongoDB for device storage)
+	var deviceService *services.DeviceService
+	var deviceAuthHandler *handlers.DeviceAuthHandler
+	if mongoDB != nil {
+		deviceService = services.NewDeviceService(mongoDB, db)
+		if err := deviceService.InitializeIndexes(context.Background()); err != nil {
+			log.Printf("⚠️ Failed to initialize device auth indexes: %v", err)
+		}
+		deviceAuthHandler = handlers.NewDeviceAuthHandler(deviceService)
+		// Register device service with auth middleware for device token validation
+		middleware.SetDeviceService(deviceService)
+		log.Println("✅ Device auth service initialized")
+	}
+
 	// Initialize local auth handler (v2.0)
 	var localAuthHandler *handlers.LocalAuthHandler
 	if jwtAuth != nil && mongoDB != nil && userService != nil {
@@ -1024,6 +1045,26 @@ func main() {
 			authRoutes.Post("/logout", middleware.LocalAuthMiddleware(jwtAuth), localAuthHandler.Logout)
 			authRoutes.Get("/me", middleware.LocalAuthMiddleware(jwtAuth), localAuthHandler.GetCurrentUser)
 			log.Println("✅ Local auth routes registered (/api/auth/*)")
+		}
+
+		// Device authentication routes (OAuth 2.0 Device Authorization Grant - RFC 8628)
+		if deviceAuthHandler != nil {
+			// Public endpoints (no auth required - used by CLI)
+			api.Post("/device/code", deviceAuthHandler.GenerateDeviceCode)
+			api.Get("/device/token", deviceAuthHandler.PollForToken)
+			api.Post("/devices/refresh-token", deviceAuthHandler.RefreshToken)
+
+			// Authenticated endpoints (user in browser)
+			api.Post("/device/authorize", middleware.LocalAuthMiddleware(jwtAuth), deviceAuthHandler.AuthorizeDevice)
+			api.Get("/device/pending", middleware.LocalAuthMiddleware(jwtAuth), deviceAuthHandler.GetPendingAuth)
+
+			// Device management (authenticated)
+			devices := api.Group("/devices", middleware.LocalAuthMiddleware(jwtAuth))
+			devices.Get("/", deviceAuthHandler.ListDevices)
+			devices.Put("/:id", deviceAuthHandler.UpdateDevice)
+			devices.Delete("/:id", deviceAuthHandler.RevokeDevice)
+
+			log.Println("✅ Device auth routes registered (/api/device/*, /api/devices/*)")
 		}
 
 		// Memory management routes (requires authentication + memory services)
@@ -1615,6 +1656,36 @@ func main() {
 		log.Printf("⚠️  Failed to start job scheduler: %v", err)
 	} else {
 		log.Println("✅ Background job scheduler started")
+	}
+
+	// Serve frontend static files when running in all-in-one Docker mode
+	if os.Getenv("SERVE_FRONTEND") == "true" {
+		frontendDir := os.Getenv("FRONTEND_DIR")
+		if frontendDir == "" {
+			frontendDir = "/app/public"
+		}
+		if _, err := os.Stat(frontendDir); err == nil {
+			app.Static("/", frontendDir, fiber.Static{
+				Compress:      true,
+				CacheDuration: 24 * time.Hour,
+			})
+			// SPA fallback: serve index.html for frontend routes only.
+			// Skip API, WebSocket, and other backend paths.
+			app.Get("/*", func(c *fiber.Ctx) error {
+				path := c.Path()
+				if strings.HasPrefix(path, "/api/") ||
+					strings.HasPrefix(path, "/ws/") ||
+					strings.HasPrefix(path, "/mcp/") ||
+					path == "/health" ||
+					path == "/metrics" {
+					return c.Next()
+				}
+				return c.SendFile(filepath.Join(frontendDir, "index.html"))
+			})
+			log.Printf("🌐 Frontend serving from %s", frontendDir)
+		} else {
+			log.Printf("⚠️  SERVE_FRONTEND=true but directory %s not found", frontendDir)
+		}
 	}
 
 	// Start server

@@ -15,6 +15,7 @@ import {
   Skills,
   SkillEditor,
   Nexus,
+  DeviceAuth,
 } from '@/pages';
 import { ResetPassword } from '@/pages/ResetPassword';
 import { ProtectedRoute, AdminRoute } from '@/components/auth';
@@ -130,6 +131,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Community />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/device',
+        element: (
+          <ProtectedRoute>
+            <DeviceAuth />
           </ProtectedRoute>
         ),
       },

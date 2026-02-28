@@ -18,7 +18,7 @@ NC='\033[0m'
 BOLD='\033[1m'
 
 # URLs
-GITHUB_REPO="claraverse-space/ClaraVerseAI"
+GITHUB_REPO="claraverse-space/ClaraVerse"
 CLI_URL="https://raw.githubusercontent.com/${GITHUB_REPO}/main/cli/claraverse"
 INSTALL_PATH="/usr/local/bin/claraverse"
 

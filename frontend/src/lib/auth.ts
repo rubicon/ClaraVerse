@@ -2,6 +2,7 @@
  * Local JWT Authentication Client
  * Replaces Supabase with local authentication
  */
+import { getApiBaseUrl } from '@/lib/config';
 
 interface User {
   id: string;
@@ -45,7 +46,7 @@ class AuthClient {
    * Register a new user
    */
   async signUp(email: string, password: string): Promise<User> {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/register`, {
+    const response = await fetch(`${getApiBaseUrl()}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +69,7 @@ class AuthClient {
    * Sign in an existing user
    */
   async signIn(email: string, password: string): Promise<User> {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
+    const response = await fetch(`${getApiBaseUrl()}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ class AuthClient {
    */
   async signOut(): Promise<void> {
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`, {
+      await fetch(`${getApiBaseUrl()}/api/auth/logout`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         credentials: 'include',
@@ -109,7 +110,7 @@ class AuthClient {
    * Refresh the access token
    */
   async refreshToken(): Promise<string> {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/refresh`, {
+    const response = await fetch(`${getApiBaseUrl()}/api/auth/refresh`, {
       method: 'POST',
       credentials: 'include', // Refresh token is in httpOnly cookie
     });

@@ -8,6 +8,7 @@
 import { useAgentBuilderStore } from '@/store/useAgentBuilderStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import type { BlockExecutionStatus, ExecutionAPIResponse } from '@/types/agent';
+import { getApiBaseUrl } from '@/lib/config';
 
 // WebSocket message types
 interface ExecuteWorkflowMessage {
@@ -53,7 +54,7 @@ class WorkflowExecutionService {
    */
   private getWebSocketUrl(): string {
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    const baseUrl = getApiBaseUrl() || window.location.origin;
     const wsHost = baseUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
     // Get auth token

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { ExternalLink, ZoomIn, X } from 'lucide-react';
+import { getApiBaseUrl } from '@/lib/config';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const API_BASE_URL = getApiBaseUrl();
 
 interface ImageSearchResult {
   title: string;

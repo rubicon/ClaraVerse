@@ -632,7 +632,7 @@ Be THOROUGH - it's better to include too much detail than to lose critical conte
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+config.APIKey)
 
-	client := &http.Client{Timeout: 60 * time.Second}
+	client := &http.Client{Timeout: 600 * time.Second} // 10 min — local models may cold start
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("❌ [SUMMARY] Request failed: %v", err)
@@ -1961,8 +1961,8 @@ func (s *ChatService) StreamChatCompletion(userConn *models.UserConnection) erro
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+config.APIKey)
 
-	// Send request
-	client := &http.Client{Timeout: 120 * time.Second}
+	// Send request (10 min timeout — local models like Ollama need time to cold start + generate)
+	client := &http.Client{Timeout: 600 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
@@ -3191,7 +3191,7 @@ func (s *ChatService) generateConversationTitle(userConn *models.UserConnection,
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+config.APIKey)
 
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := &http.Client{Timeout: 600 * time.Second} // 10 min — local models may cold start
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("❌ [TITLE] Request failed: %v", err)
@@ -3296,8 +3296,8 @@ func (s *ChatService) ChatCompletionSync(ctx context.Context, userID, modelID st
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+config.APIKey)
 
-	// Send request
-	client := &http.Client{Timeout: 120 * time.Second}
+	// Send request (10 min timeout — local models may cold start)
+	client := &http.Client{Timeout: 600 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("request failed: %w", err)
@@ -3400,8 +3400,8 @@ func (s *ChatService) ChatCompletionWithToolsEx(ctx context.Context, userID, con
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", "Bearer "+config.APIKey)
 
-		// Send request with longer timeout for tool execution
-		client := &http.Client{Timeout: 180 * time.Second}
+		// Send request with longer timeout for tool execution + local model cold starts
+		client := &http.Client{Timeout: 600 * time.Second}
 		resp, err := client.Do(req)
 		if err != nil {
 			return nil, fmt.Errorf("request failed: %w", err)

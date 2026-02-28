@@ -1,8 +1,9 @@
 import { useSubscriptionStore } from '@/store/useSubscriptionStore';
 import { authClient } from '@/lib/auth';
+import { getApiBaseUrl } from '@/lib/config';
 
-// Use relative URL when not specified (works with nginx proxy in all-in-one container)
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+// Use relative URL when not specified (works in all-in-one Docker container)
+const API_BASE_URL = getApiBaseUrl();
 
 export class ApiError extends Error {
   status: number;

@@ -10,6 +10,7 @@ export { BillingSection } from './BillingSection';
 export { UsageSection } from './UsageSection';
 export { CredentialsSection } from './CredentialsSection';
 export { ChannelsSection } from './ChannelsSection';
+export { DevicesSection } from './DevicesSection';
 export { PrivacySection } from './PrivacySection';
 export { AccountSection } from './AccountSection';
 export { PrivacyPolicySidebar } from './PrivacyPolicySidebar';

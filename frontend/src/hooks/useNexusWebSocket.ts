@@ -8,8 +8,9 @@ import type {
 } from '@/types/nexus';
 import { useNexusStore } from '@/store/useNexusStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { getWsUrl } from '@/lib/config';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
+const WS_URL = getWsUrl();
 const WS_ENDPOINT = '/ws/nexus';
 const HEARTBEAT_INTERVAL = 25000;
 const MAX_RECONNECT_DELAY = 30000;

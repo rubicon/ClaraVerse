@@ -9,8 +9,9 @@ import type {
 import { formatFileSize } from '@/services/uploadService';
 import { useCachedImage } from '@/hooks/useCachedImage';
 import { DataTablePreview } from './DataTablePreview';
+import { getApiBaseUrl } from '@/lib/config';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const API_BASE_URL = getApiBaseUrl();
 
 // Sub-component for individual image to use the hook
 interface CachedImageProps {

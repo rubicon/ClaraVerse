@@ -1,12 +1,24 @@
 package middleware
 
 import (
+	"claraverse/internal/services"
 	"claraverse/pkg/auth"
+	"context"
 	"log"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
+
+// deviceServiceInstance is the shared device service for middleware use
+var deviceServiceInstance *services.DeviceService
+
+// SetDeviceService sets the device service for middleware device token validation
+func SetDeviceService(ds *services.DeviceService) {
+	deviceServiceInstance = ds
+}
 
 // LocalAuthMiddleware verifies local JWT tokens
 // Supports both Authorization header and query parameter (for WebSocket connections)
@@ -59,7 +71,36 @@ func LocalAuthMiddleware(jwtAuth *auth.LocalJWTAuth) fiber.Handler {
 			})
 		}
 
-		// Verify JWT token
+		// Try device token first (if device service is available and token looks like a device JWT)
+		if deviceServiceInstance != nil && isDeviceToken(token) {
+			claims, err := deviceServiceInstance.ValidateDeviceToken(token)
+			if err == nil {
+				// Check if device is revoked
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+
+				revoked, err := deviceServiceInstance.IsDeviceRevoked(ctx, claims.DeviceID)
+				if err != nil {
+					log.Printf("Error checking device revocation: %v", err)
+				} else if revoked {
+					return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+						"error": "Device has been revoked",
+					})
+				}
+
+				// Store device user info in context
+				c.Locals("user_id", claims.Subject)
+				c.Locals("user_role", "authenticated")
+				c.Locals("device_id", claims.DeviceID)
+				c.Locals("device_claims", claims)
+				c.Locals("auth_type", "device")
+
+				return c.Next()
+			}
+			// If device token validation fails, fall through to local JWT validation
+		}
+
+		// Verify local JWT token
 		user, err := jwtAuth.VerifyAccessToken(token)
 		if err != nil {
 			log.Printf("❌ Auth failed: %v", err)
@@ -72,8 +113,8 @@ func LocalAuthMiddleware(jwtAuth *auth.LocalJWTAuth) fiber.Handler {
 		c.Locals("user_id", user.ID)
 		c.Locals("user_email", user.Email)
 		c.Locals("user_role", user.Role)
+		c.Locals("auth_type", "local")
 
-		log.Printf("✅ Authenticated user: %s (%s)", user.Email, user.ID)
 		return c.Next()
 	}
 }
@@ -102,7 +143,6 @@ func OptionalLocalAuthMiddleware(jwtAuth *auth.LocalJWTAuth) fiber.Handler {
 		// If no token found, proceed as anonymous
 		if token == "" {
 			c.Locals("user_id", "anonymous")
-			log.Println("🔓 Anonymous connection")
 			return c.Next()
 		}
 
@@ -118,21 +158,46 @@ func OptionalLocalAuthMiddleware(jwtAuth *auth.LocalJWTAuth) fiber.Handler {
 			// Only allow in development/testing
 			if environment != "development" && environment != "testing" && environment != "" {
 				c.Locals("user_id", "anonymous")
-				log.Println("⚠️  JWT unavailable, proceeding as anonymous")
 				return c.Next()
 			}
 
 			c.Locals("user_id", "dev-user")
 			c.Locals("user_email", "dev@localhost")
 			c.Locals("user_role", "user")
-			log.Println("⚠️  Auth skipped: JWT not configured (dev mode)")
 			return c.Next()
 		}
 
-		// Verify JWT token
+		// Try device token first (if device service is available and token looks like a device JWT)
+		if deviceServiceInstance != nil && isDeviceToken(token) {
+			claims, err := deviceServiceInstance.ValidateDeviceToken(token)
+			if err == nil {
+				// Check if device is revoked
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+
+				revoked, err := deviceServiceInstance.IsDeviceRevoked(ctx, claims.DeviceID)
+				if err != nil {
+					log.Printf("Error checking device revocation: %v", err)
+				} else if revoked {
+					c.Locals("user_id", "anonymous")
+					return c.Next()
+				}
+
+				// Store device user info in context
+				c.Locals("user_id", claims.Subject)
+				c.Locals("user_role", "authenticated")
+				c.Locals("device_id", claims.DeviceID)
+				c.Locals("device_claims", claims)
+				c.Locals("auth_type", "device")
+
+				return c.Next()
+			}
+			// If device token validation fails, fall through to local JWT validation
+		}
+
+		// Verify local JWT token
 		user, err := jwtAuth.VerifyAccessToken(token)
 		if err != nil {
-			log.Printf("⚠️  Token validation failed: %v (continuing as anonymous)", err)
 			c.Locals("user_id", "anonymous")
 			return c.Next()
 		}
@@ -141,10 +206,22 @@ func OptionalLocalAuthMiddleware(jwtAuth *auth.LocalJWTAuth) fiber.Handler {
 		c.Locals("user_id", user.ID)
 		c.Locals("user_email", user.Email)
 		c.Locals("user_role", user.Role)
+		c.Locals("auth_type", "local")
 
-		log.Printf("✅ Authenticated user: %s (%s)", user.Email, user.ID)
 		return c.Next()
 	}
+}
+
+// isDeviceToken checks if a token looks like a ClaraVerse device JWT
+// Device tokens are JWTs with "claraverse" issuer
+func isDeviceToken(token string) bool {
+	// JWTs have 3 parts separated by dots
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		return false
+	}
+	// Quick check: both header and payload start with base64-encoded JSON (eyJ prefix)
+	return strings.HasPrefix(parts[0], "eyJ") && strings.HasPrefix(parts[1], "eyJ")
 }
 
 // RateLimitedAuthMiddleware combines rate limiting with authentication
