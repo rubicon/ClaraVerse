@@ -35,7 +35,7 @@ If you have **Ollama** or **LM Studio** running on your machine, ClaraVerse dete
 ### One-line install (Linux / macOS)
 
 ```bash
-curl -fsSL https://get.claraverse.app | bash && claraverse init
+curl -fsSL https://raw.githubusercontent.com/claraverse-space/ClaraVerse/main/cli/install.sh | bash && claraverse init
 ```
 
 ### Docker Compose
@@ -61,10 +61,10 @@ docker run -d \
   -v claraverse-data:/app/data \
   -v claraverse-uploads:/app/uploads \
   --add-host=host.docker.internal:host-gateway \
-  ghcr.io/claraverse/claraverse:latest
+  ghcr.io/claraverse-space/claraverse:latest
 ```
 
-This runs ClaraVerse with SQLite (no external databases needed). For production use with MySQL/MongoDB/Redis, use the Docker Compose setup above.
+This runs ClaraVerse with a single container. For the full stack with MySQL, MongoDB, Redis, and SearXNG, use the Docker Compose setup above.
 
 </details>
 
@@ -181,6 +181,25 @@ Use agents with your web apps, schedule daily messages, automate repetitive work
 | **Memory System** | Clara remembers context across conversations, auto-archives old memories |
 | **BYOK** | Bring your own API keys or use free local models |
 | **Smart Tool Router** | Lightweight models can be assigned to pick the right tools on the fly |
+
+---
+
+## Clara Companion (MCP Bridge)
+
+Connect your local tools and filesystem to ClaraVerse via the Clara Companion CLI. It bridges local MCP servers to your ClaraVerse instance over WebSocket.
+
+```bash
+# Install via the claraverse CLI
+claraverse companion install
+
+# Login (choose default localhost:3000 or enter your server URL)
+claraverse companion login
+
+# Start the bridge
+claraverse companion start
+```
+
+Or install manually from [GitHub Releases](https://github.com/claraverse-space/ClaraVerse/releases).
 
 ---
 
