@@ -5,6 +5,7 @@
 #   ./build.sh           Build production (all platforms)
 #   ./build.sh dev       Build dev (local backend, current platform only)
 #   ./build.sh prod      Build production (all platforms)
+#   ./build.sh oss       Build OSS (localhost:3000 default, all platforms)
 
 set -e
 
@@ -28,6 +29,7 @@ fi
 # Backend URLs
 PROD_URL="wss://claraverse.app/mcp/connect"
 DEV_URL="ws://localhost:3001/mcp/connect"
+OSS_URL="ws://localhost:3000/mcp/connect"
 
 if [ "$MODE" = "dev" ]; then
     BACKEND_URL="$DEV_URL"
@@ -44,12 +46,18 @@ if [ "$MODE" = "dev" ]; then
     exit 0
 fi
 
-# Production build
-BACKEND_URL="$PROD_URL"
-LDFLAGS="-X ${PKG}.DefaultBackendURL=${BACKEND_URL} -X main.Version=${VERSION} -s -w"
-
-echo "Building Clara Companion (PROD → ${PROD_URL})"
-echo ""
+if [ "$MODE" = "oss" ]; then
+    BACKEND_URL="$OSS_URL"
+    LDFLAGS="-X ${PKG}.DefaultBackendURL=${BACKEND_URL} -X main.Version=${VERSION}-oss -s -w"
+    echo "Building Clara Companion (OSS → ${OSS_URL})"
+    echo ""
+else
+    # Production build
+    BACKEND_URL="$PROD_URL"
+    LDFLAGS="-X ${PKG}.DefaultBackendURL=${BACKEND_URL} -X main.Version=${VERSION} -s -w"
+    echo "Building Clara Companion (PROD → ${PROD_URL})"
+    echo ""
+fi
 
 # Create bin directory
 mkdir -p bin

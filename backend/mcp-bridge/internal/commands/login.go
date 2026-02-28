@@ -109,6 +109,16 @@ func runLogin(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
+	// Prompt for server URL
+	backendURL, err := promptServerURL()
+	if err != nil {
+		return err
+	}
+	cfg.BackendURL = backendURL
+	if err := config.Save(cfg); err != nil {
+		return fmt.Errorf("failed to save config: %w", err)
+	}
+
 	// Run device auth
 	if err := runDeviceAuth(cfg); err != nil {
 		return err
@@ -118,6 +128,60 @@ func runLogin(cmd *cobra.Command, args []string) error {
 	fmt.Println(successStyle.Render("Launching Clara Companion..."))
 	fmt.Println()
 	return RunTUIDefault()
+}
+
+func promptServerURL() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Println(stepStyle.Render("  Server Connection"))
+	fmt.Println()
+
+	// Determine default from build-time or fallback
+	defaultWS := config.DefaultBackendURL
+	defaultHTTP := config.DefaultAPIBaseURL()
+	if defaultHTTP == "" {
+		defaultHTTP = "http://localhost:3000"
+		defaultWS = "ws://localhost:3000/mcp/connect"
+	}
+
+	fmt.Printf("  [1] Default (%s)\n", defaultHTTP)
+	fmt.Println("  [2] Custom URL")
+	fmt.Println()
+	fmt.Print("  Choose (1/2) [1]: ")
+
+	choice, _ := reader.ReadString('\n')
+	choice = strings.TrimSpace(choice)
+
+	if choice == "" || choice == "1" {
+		fmt.Printf("  → Using %s\n\n", defaultHTTP)
+		return defaultWS, nil
+	}
+
+	fmt.Print("  Enter your ClaraVerse URL (e.g. https://my-server.com): ")
+	customURL, _ := reader.ReadString('\n')
+	customURL = strings.TrimSpace(customURL)
+
+	if customURL == "" {
+		return defaultWS, nil
+	}
+
+	// Normalize: strip trailing slash
+	customURL = strings.TrimRight(customURL, "/")
+
+	// Convert HTTP URL to WS URL for the backend connection
+	wsURL := customURL
+	if strings.HasPrefix(wsURL, "https://") {
+		wsURL = "wss://" + strings.TrimPrefix(wsURL, "https://")
+	} else if strings.HasPrefix(wsURL, "http://") {
+		wsURL = "ws://" + strings.TrimPrefix(wsURL, "http://")
+	} else {
+		// Assume plain hostname, use ws://
+		wsURL = "ws://" + wsURL
+	}
+	wsURL += "/mcp/connect"
+
+	fmt.Printf("  → Connecting to %s\n\n", customURL)
+	return wsURL, nil
 }
 
 func printHeader() {

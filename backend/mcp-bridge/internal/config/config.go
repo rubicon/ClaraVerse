@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strings"
 
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
@@ -22,18 +23,19 @@ var DefaultBackendURL = "wss://claraverse.app/mcp/connect"
 //      "ws://localhost:3001/mcp/connect"   → "http://localhost:3001"
 func DefaultAPIBaseURL() string {
 	u := DefaultBackendURL
-	// Strip WebSocket path
+	// Strip WebSocket path (try longest suffix first, stop after first match)
 	for _, suffix := range []string{"/mcp/connect", "/mcp"} {
-		if len(u) > len(suffix) {
+		if strings.HasSuffix(u, suffix) {
 			u = u[:len(u)-len(suffix)]
+			break
 		}
 	}
 	// Convert ws(s):// to http(s)://
-	if len(u) > 4 && u[:4] == "wss:" {
-		return "https:" + u[4:]
+	if strings.HasPrefix(u, "wss://") {
+		return "https://" + u[6:]
 	}
-	if len(u) > 3 && u[:3] == "ws:" {
-		return "http:" + u[3:]
+	if strings.HasPrefix(u, "ws://") {
+		return "http://" + u[5:]
 	}
 	return u
 }
