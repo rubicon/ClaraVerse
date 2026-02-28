@@ -20,7 +20,7 @@
 
 ## What is ClaraVerse?
 
-ClaraVerse is a private AI workspace that combines chat, image generation, and visual workflows in one app. Use OpenAI, Claude, Gemini, or local models like Ollama — with browser-local storage that keeps your conversations private. Even server admins can't read your chats.
+ClaraVerse is a private AI workspace that combines chat, visual workflows, long-running tasks, and Telegram integration in one app. Assign Clara research, coding, or automation tasks and track everything on a board. Use OpenAI, Claude, Gemini, or local models like Ollama — with browser-local storage that keeps your conversations private.
 
 If you have **Ollama** or **LM Studio** running on your machine, ClaraVerse detects them automatically and imports all your models — zero configuration.
 
@@ -129,6 +129,24 @@ docker compose -f docker-compose.production.yml down -v && docker compose -f doc
 
 ## Core Capabilities
 
+### Nexus — Your AI Command Center
+Assign Clara long-running tasks like research, coding, or analysis. Track everything on a Kanban board — you always know what she's working on and why. No black box.
+<p align="center">
+  <img src="docs/images/nexus.gif" alt="Nexus - AI Task Management" width="80%" />
+</p>
+
+### Skills in Chat
+Clara uses skills mid-conversation — context-aware tools that activate when needed. Search the web, generate images, analyze data, all without leaving the chat.
+<p align="center">
+  <img src="docs/images/skills.png" alt="Skills in Chat" width="80%" />
+</p>
+
+### Channels — Telegram Integration
+Talk to Clara from Telegram when you're away from the app. Set up routines that run on a schedule and report back to your phone.
+<p align="center">
+  <img src="docs/images/channels.png" alt="Channels - Telegram Integration" width="80%" />
+</p>
+
 ### Interactive Artifacts
 Have all your creations in one place — images, charts, games, apps and more.
 <p align="center">
@@ -147,20 +165,14 @@ The AI asks you visual questions when it needs your input.
   <img src="https://github.com/user-attachments/assets/bbd5444d-2031-4193-ba6a-96ab7c96768d" width="80%" />
 </p>
 
-### 100+ Tool Integrations
-Slack, GitHub, Jira, Google Sheets, Notion, Discord, and many more — built in, no MCP required.
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/c7071171-a7c9-4cd2-8806-534d78914732" width="80%" />
-</p>
-
-### Prompt-to-Agent Builder
-Describe the workflow you need and let the LLM build the automation for you.
+### Workflows — Visual Automation
+Drag-and-drop workflow builder with parallel execution, scheduling, and 200+ integrations. Describe what you need and let the LLM build the automation for you.
 <p align="center">
   <img src="https://github.com/user-attachments/assets/02154cd3-7adf-43cc-b5e8-0dcbdc9a75af" width="80%" />
 </p>
 
 ### Schedule, API and Automate
-Use agents with your web apps, schedule daily messages, automate repetitive workflows.
+Use workflows with your web apps, schedule daily messages, automate repetitive tasks.
 <p align="center">
   <img src="https://github.com/user-attachments/assets/1858fb39-a61c-4976-9a85-3142fda6269b" width="80%" />
 </p>
@@ -171,16 +183,19 @@ Use agents with your web apps, schedule daily messages, automate repetitive work
 
 | Feature | Description |
 |---------|-------------|
+| **Nexus** | Assign long-running tasks, track progress on a Kanban board |
+| **Skills** | Context-aware tools that activate mid-conversation when needed |
+| **Channels** | Telegram integration — talk to Clara from your phone |
+| **Routines** | Scheduled task sequences that report back via Telegram |
+| **Workflows** | Drag-and-drop builder with parallel execution, scheduling, 200+ integrations |
+| **Devices** | Connect all your machines — Clara reaches MCP on any of them remotely |
 | **Browser-Local Storage** | Conversations stay in IndexedDB — zero-knowledge architecture |
 | **Local AI Auto-Detection** | Ollama and LM Studio discovered and imported automatically |
 | **Multi-Provider** | OpenAI, Anthropic, Google, Ollama, any OpenAI-compatible endpoint |
-| **Visual Workflows** | Drag-and-drop agent builder — chat to design, visual editor to refine |
 | **MCP Bridge** | Native Model Context Protocol support for seamless tool connections |
 | **Interactive Prompts** | AI asks clarifying questions mid-conversation with typed forms |
-| **Code Execution** | Run Python/JS in sandboxed E2B containers |
 | **Memory System** | Clara remembers context across conversations, auto-archives old memories |
 | **BYOK** | Bring your own API keys or use free local models |
-| **Smart Tool Router** | Lightweight models can be assigned to pick the right tools on the fly |
 
 ---
 
