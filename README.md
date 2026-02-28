@@ -152,7 +152,7 @@ Talk to Clara from Telegram when you're away from the app. Set up routines that 
 
 ### 150+ Integrations & Tools Out of the Box
 
-Slack, GitHub, Jira, Google Sheets, Notion, Discord, Telegram, HubSpot, and many more — built in, no MCP required.
+Slack, GitHub, Jira, Google Sheets, Notion, Discord, Telegram, HubSpot, and many more — built in, no MCP required. All integrations are shared across Chat, Workflows, Nexus, and Routines. Connect once, use everywhere.
 
 <p align="center">
   <img src="docs/images/integration.png" alt="150+ Integrations" width="80%" />
@@ -209,7 +209,7 @@ Use workflows with your web apps, schedule daily messages, automate repetitive t
 | **Channels**                | Telegram integration — talk to Clara from your phone                        |
 | **Routines**                | Scheduled task sequences that report back via Telegram                       |
 | **Workflows**               | Drag-and-drop builder with parallel execution, scheduling, 200+ integrations |
-| **150+ Integrations**       | Slack, GitHub, Jira, Notion, Discord, HubSpot, and more — built in          |
+| **150+ Integrations**       | Slack, GitHub, Jira, Notion, and more — shared across Chat, Workflows, Nexus, and Routines |
 | **Devices**                 | Connect all your machines — Clara reaches MCP on any of them remotely       |
 | **Clara Companion**         | Bridge local MCP servers to ClaraVerse over WebSocket from any machine       |
 | **Browser-Local Storage**   | Conversations stay in IndexedDB — zero-knowledge architecture               |
