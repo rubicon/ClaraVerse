@@ -231,10 +231,24 @@ compose_cmd() {
 }
 
 is_running() {
+    # Only check compose-managed containers (not old standalone ones)
     compose_cmd ps --status running --format json 2>/dev/null | grep -q '"app"' 2>/dev/null && return 0
-    # Fallback check
-    docker ps --format '{{.Names}}' 2>/dev/null | grep -q "^claraverse$" && return 0
+    compose_cmd ps --status running 2>/dev/null | grep -q "claraverse-app" && return 0
     return 1
+}
+
+# Remove leftover containers from old CLI versions (standalone, non-compose)
+cleanup_legacy() {
+    for name in claraverse claraverse-search; do
+        if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q "^${name}$"; then
+            # Only remove if not managed by our compose project
+            local project=$(docker inspect --format '{{index .Config.Labels "com.docker.compose.project"}}' "$name" 2>/dev/null || echo "")
+            if [ "$project" != "$PROJECT_NAME" ]; then
+                docker stop "$name" 2>/dev/null || true
+                docker rm "$name" 2>/dev/null || true
+            fi
+        fi
+    done
 }
 
 is_installed() {
@@ -270,6 +284,7 @@ cmd_init() {
     echo ""
 
     check_docker
+    cleanup_legacy
     ensure_directories
 
     local port="${1:-3000}"
@@ -552,6 +567,7 @@ cmd_clean() {
 
     log_step "Stopping and removing everything..."
     compose_cmd down -v 2>/dev/null || true
+    cleanup_legacy
 
     log_success "All ClaraVerse data removed"
     echo ""
