@@ -1645,11 +1645,13 @@ func main() {
 		log.Println("⚠️  MongoDB-dependent jobs disabled (requires MongoDB, TierService, UserService)")
 	}
 
-	// Register provider health check job (runs every 30 minutes)
-	if healthSvc := services.GetHealthService(); healthSvc != nil {
-		healthJob := jobs.NewProviderHealthChecker(healthSvc, 30*time.Minute)
-		jobScheduler.Register("provider_health_check", healthJob)
-	}
+	// Provider health check job disabled — it sends real chat completion
+	// requests to every model on a timer, which puts unnecessary load on
+	// local providers like Ollama and triggers timeouts.
+	// if healthSvc := services.GetHealthService(); healthSvc != nil {
+	// 	healthJob := jobs.NewProviderHealthChecker(healthSvc, 30*time.Minute)
+	// 	jobScheduler.Register("provider_health_check", healthJob)
+	// }
 
 	// Start job scheduler
 	if err := jobScheduler.Start(); err != nil {
