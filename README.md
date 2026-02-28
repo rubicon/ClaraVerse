@@ -189,6 +189,7 @@ Use workflows with your web apps, schedule daily messages, automate repetitive t
 | **Routines** | Scheduled task sequences that report back via Telegram |
 | **Workflows** | Drag-and-drop builder with parallel execution, scheduling, 200+ integrations |
 | **Devices** | Connect all your machines — Clara reaches MCP on any of them remotely |
+| **Clara Companion** | Bridge local MCP servers to ClaraVerse over WebSocket from any machine |
 | **Browser-Local Storage** | Conversations stay in IndexedDB — zero-knowledge architecture |
 | **Local AI Auto-Detection** | Ollama and LM Studio discovered and imported automatically |
 | **Multi-Provider** | OpenAI, Anthropic, Google, Ollama, any OpenAI-compatible endpoint |
@@ -202,6 +203,10 @@ Use workflows with your web apps, schedule daily messages, automate repetitive t
 ## Clara Companion (MCP Bridge)
 
 Connect your local tools and filesystem to ClaraVerse via the Clara Companion CLI. It bridges local MCP servers to your ClaraVerse instance over WebSocket.
+
+<p align="center">
+  <img src="docs/images/claracompanion.png" alt="Clara Companion" width="80%" />
+</p>
 
 ```bash
 # Install via the claraverse CLI
