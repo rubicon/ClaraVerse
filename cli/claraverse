@@ -725,11 +725,20 @@ cmd_companion() {
             # Symlink to /usr/local/bin if possible
             if [ -w /usr/local/bin ]; then
                 ln -sf "$install_path" /usr/local/bin/clara_companion
-            elif command -v sudo &>/dev/null; then
+            elif command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
                 sudo ln -sf "$install_path" /usr/local/bin/clara_companion
             else
-                log_warning "Could not symlink to /usr/local/bin"
-                echo "Add this to your PATH: $INSTALL_DIR/bin"
+                # Add to PATH via shell profile if not already there
+                local bin_dir="$INSTALL_DIR/bin"
+                if ! echo "$PATH" | grep -q "$bin_dir"; then
+                    for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+                        if [ -f "$rc" ] && ! grep -q "claraverse/bin" "$rc"; then
+                            echo "export PATH=\"$bin_dir:\$PATH\"" >> "$rc"
+                        fi
+                    done
+                    export PATH="$bin_dir:$PATH"
+                    echo "  Added $bin_dir to PATH"
+                fi
             fi
 
             log_success "Clara Companion installed!"
