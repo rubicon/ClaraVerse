@@ -24,10 +24,6 @@ ClaraVerse is a private AI workspace that combines chat, visual workflows, long-
 
 If you have **Ollama** or **LM Studio** running on your machine, ClaraVerse detects them automatically and imports all your models — zero configuration.
 
-<p align="center">
-<img src="docs/images/clara-chat-demo.gif" alt="ClaraVerse Demo" width="800" />
-</p>
-
 ---
 
 ## Quick Start
@@ -72,6 +68,7 @@ This runs ClaraVerse with a single container. For the full stack with MySQL, Mon
 <summary><b>Advanced configuration</b></summary>
 
 ### Prerequisites
+
 - Docker & Docker Compose v2+
 - 4 GB RAM minimum (8 GB recommended)
 - Ollama, LM Studio, or any OpenAI-compatible API
@@ -93,10 +90,10 @@ LMSTUDIO_BASE_URL=http://host.docker.internal:1234
 
 ClaraVerse automatically discovers local AI providers running on your host machine:
 
-| Provider | Default URL | What happens |
-|----------|-------------|--------------|
-| **Ollama** | `http://host.docker.internal:11434` | Models imported, provider created, visibility set |
-| **LM Studio** | `http://host.docker.internal:1234` | Models imported via OpenAI-compatible API |
+| Provider            | Default URL                           | What happens                                      |
+| ------------------- | ------------------------------------- | ------------------------------------------------- |
+| **Ollama**    | `http://host.docker.internal:11434` | Models imported, provider created, visibility set |
+| **LM Studio** | `http://host.docker.internal:1234`  | Models imported via OpenAI-compatible API         |
 
 The discovery runs every 2 minutes. When a provider goes offline, it's automatically disabled. When it comes back, models are re-imported.
 
@@ -130,49 +127,73 @@ docker compose -f docker-compose.production.yml down -v && docker compose -f doc
 ## Core Capabilities
 
 ### Nexus — Your AI Command Center
+
 Assign Clara long-running tasks like research, coding, or analysis. Track everything on a Kanban board — you always know what she's working on and why. No black box.
+
 <p align="center">
   <img src="docs/images/nexus.gif" alt="Nexus - AI Task Management" width="80%" />
 </p>
 
 ### Skills in Chat
+
 Clara uses skills mid-conversation — context-aware tools that activate when needed. Search the web, generate images, analyze data, all without leaving the chat.
+
 <p align="center">
   <img src="docs/images/skills.png" alt="Skills in Chat" width="80%" />
 </p>
 
 ### Channels — Telegram Integration
+
 Talk to Clara from Telegram when you're away from the app. Set up routines that run on a schedule and report back to your phone.
+
 <p align="center">
   <img src="docs/images/channels.png" alt="Channels - Telegram Integration" width="80%" />
 </p>
 
+### 150+ Integrations & Tools Out of the Box
+
+Slack, GitHub, Jira, Google Sheets, Notion, Discord, Telegram, HubSpot, and many more — built in, no MCP required.
+
+<p align="center">
+  <img src="docs/images/integration.png" alt="150+ Integrations" width="80%" />
+</p>
+
 ### Interactive Artifacts
+
 Have all your creations in one place — images, charts, games, apps and more.
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/d525fc67-6792-4083-9549-1d6b0e770e9e" width="80%" />
 </p>
 
 ### AI Docs
+
 Built-in tools for PPT, PDF, CSV and much more.
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/ce881510-b7f2-4262-a3c9-f02e7c9e8e1f" width="80%" />
 </p>
 
 ### Interactive Chat UI (Human in the Loop)
+
 The AI asks you visual questions when it needs your input.
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/bbd5444d-2031-4193-ba6a-96ab7c96768d" width="80%" />
 </p>
 
 ### Workflows — Visual Automation
+
 Drag-and-drop workflow builder with parallel execution, scheduling, and 200+ integrations. Describe what you need and let the LLM build the automation for you.
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/02154cd3-7adf-43cc-b5e8-0dcbdc9a75af" width="80%" />
 </p>
 
 ### Schedule, API and Automate
+
 Use workflows with your web apps, schedule daily messages, automate repetitive tasks.
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/1858fb39-a61c-4976-9a85-3142fda6269b" width="80%" />
 </p>
@@ -181,22 +202,23 @@ Use workflows with your web apps, schedule daily messages, automate repetitive t
 
 ## Key Features
 
-| Feature | Description |
-|---------|-------------|
-| **Nexus** | Assign long-running tasks, track progress on a Kanban board |
-| **Skills** | Context-aware tools that activate mid-conversation when needed |
-| **Channels** | Telegram integration — talk to Clara from your phone |
-| **Routines** | Scheduled task sequences that report back via Telegram |
-| **Workflows** | Drag-and-drop builder with parallel execution, scheduling, 200+ integrations |
-| **Devices** | Connect all your machines — Clara reaches MCP on any of them remotely |
-| **Clara Companion** | Bridge local MCP servers to ClaraVerse over WebSocket from any machine |
-| **Browser-Local Storage** | Conversations stay in IndexedDB — zero-knowledge architecture |
-| **Local AI Auto-Detection** | Ollama and LM Studio discovered and imported automatically |
-| **Multi-Provider** | OpenAI, Anthropic, Google, Ollama, any OpenAI-compatible endpoint |
-| **MCP Bridge** | Native Model Context Protocol support for seamless tool connections |
-| **Interactive Prompts** | AI asks clarifying questions mid-conversation with typed forms |
-| **Memory System** | Clara remembers context across conversations, auto-archives old memories |
-| **BYOK** | Bring your own API keys or use free local models |
+| Feature                           | Description                                                                  |
+| --------------------------------- | ---------------------------------------------------------------------------- |
+| **Nexus**                   | Assign long-running tasks, track progress on a Kanban board                  |
+| **Skills**                  | Context-aware tools that activate mid-conversation when needed               |
+| **Channels**                | Telegram integration — talk to Clara from your phone                        |
+| **Routines**                | Scheduled task sequences that report back via Telegram                       |
+| **Workflows**               | Drag-and-drop builder with parallel execution, scheduling, 200+ integrations |
+| **150+ Integrations**       | Slack, GitHub, Jira, Notion, Discord, HubSpot, and more — built in          |
+| **Devices**                 | Connect all your machines — Clara reaches MCP on any of them remotely       |
+| **Clara Companion**         | Bridge local MCP servers to ClaraVerse over WebSocket from any machine       |
+| **Browser-Local Storage**   | Conversations stay in IndexedDB — zero-knowledge architecture               |
+| **Local AI Auto-Detection** | Ollama and LM Studio discovered and imported automatically                   |
+| **Multi-Provider**          | OpenAI, Anthropic, Google, Ollama, any OpenAI-compatible endpoint            |
+| **MCP Bridge**              | Native Model Context Protocol support for seamless tool connections          |
+| **Interactive Prompts**     | AI asks clarifying questions mid-conversation with typed forms               |
+| **Memory System**           | Clara remembers context across conversations, auto-archives old memories     |
+| **BYOK**                    | Bring your own API keys or use free local models                             |
 
 ---
 
@@ -210,13 +232,13 @@ Connect your local tools and filesystem to ClaraVerse via the Clara Companion CL
 
 ```bash
 # Install via the claraverse CLI
-claraverse companion install
+claraverse companion
 
 # Login (choose default localhost:3000 or enter your server URL)
-claraverse companion login
+clara_companion login
 
 # Start the bridge
-claraverse companion start
+clara_companion
 ```
 
 Or install manually from [GitHub Releases](https://github.com/claraverse-space/ClaraVerse/releases).
@@ -225,23 +247,23 @@ Or install manually from [GitHub Releases](https://github.com/claraverse-space/C
 
 ## Try It Out
 
-| Option | Description |
-|--------|-------------|
-| [**Cloud**](https://claraverse.space) | Free hosted version — no setup required |
-| [**Self-Hosted**](#quick-start) | Docker deployment (this repo) — full control on your infrastructure |
-| [**Desktop**](https://github.com/claraverse-space/ClaraVerse-Desktop) | Standalone Electron app for Windows, macOS, Linux |
+| Option                                                                   | Description                                                          |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| [**Cloud**](https://claraverse.space)                                 | Free hosted version — no setup required                             |
+| [**Self-Hosted**](#quick-start)                                       | Docker deployment (this repo) — full control on your infrastructure |
+| [**Desktop**](https://github.com/claraverse-space/ClaraVerse-Desktop) | Standalone Electron app for Windows, macOS, Linux                    |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
+| Layer              | Technology                                            |
+| ------------------ | ----------------------------------------------------- |
 | **Frontend** | React 19, TypeScript, Vite 7, Tailwind CSS 4, Zustand |
-| **Backend** | Go 1.24, Fiber, WebSocket streaming |
+| **Backend**  | Go 1.24, Fiber, WebSocket streaming                   |
 | **Database** | MySQL, MongoDB, Redis (all bundled in Docker Compose) |
-| **Search** | SearXNG (private, self-hosted) |
-| **Auth** | Local JWT with Argon2id password hashing |
+| **Search**   | SearXNG (private, self-hosted)                        |
+| **Auth**     | Local JWT with Argon2id password hashing              |
 
 ---
 
@@ -279,13 +301,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for coding standards and PR guidelines.
 
 ## Documentation
 
-| Resource | Description |
-|----------|-------------|
-| [Architecture](docs/ARCHITECTURE.md) | System architecture and design decisions |
-| [API Reference](docs/API_REFERENCE.md) | REST and WebSocket API |
-| [Admin Guide](docs/ADMIN_GUIDE.md) | System administration and provider setup |
-| [Developer Guide](docs/DEVELOPER_GUIDE.md) | Contributing and local development |
-| [Quick Reference](docs/QUICK_REFERENCE.md) | Common commands and shortcuts |
+| Resource                                | Description                              |
+| --------------------------------------- | ---------------------------------------- |
+| [Architecture](docs/ARCHITECTURE.md)       | System architecture and design decisions |
+| [API Reference](docs/API_REFERENCE.md)     | REST and WebSocket API                   |
+| [Admin Guide](docs/ADMIN_GUIDE.md)         | System administration and provider setup |
+| [Developer Guide](docs/DEVELOPER_GUIDE.md) | Contributing and local development       |
+| [Quick Reference](docs/QUICK_REFERENCE.md) | Common commands and shortcuts            |
 
 ---
 
@@ -298,6 +320,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for coding standards and PR guidelines.
 5. Commit and open a Pull Request
 
 **Areas we need help:**
+
 - Bug fixes ([open issues](https://github.com/claraverse-space/ClaraVerse/issues))
 - New tool integrations and model providers
 - Documentation improvements
