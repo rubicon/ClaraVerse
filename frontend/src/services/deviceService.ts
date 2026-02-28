@@ -4,25 +4,13 @@
  */
 
 import { getApiBaseUrl } from '@/lib/config';
+import { authClient } from '@/lib/auth';
 
 const API_BASE_URL = `${getApiBaseUrl()}/api`;
 
-// Get JWT token from auth store
+// Get JWT token from the auth client (same source as api.ts)
 function getAuthToken(): string | null {
-  try {
-    const authStorage = localStorage.getItem('auth-storage');
-    if (authStorage) {
-      const parsed = JSON.parse(authStorage);
-      if (parsed?.state?.accessToken) {
-        return parsed.state.accessToken;
-      }
-    }
-  } catch {
-    // Invalid JSON
-  }
-
-  // Fallback
-  return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  return authClient.getAccessToken();
 }
 
 function createAuthHeaders(): HeadersInit {
