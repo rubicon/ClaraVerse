@@ -39,7 +39,19 @@ const config: Config = {
           editUrl:
             'https://github.com/claraverse/ClaraVerse-Scarlet-OSS/tree/main/docs-site/',
         },
-        blog: false,
+        blog: {
+          showReadingTime: true,
+          blogSidebarTitle: 'All Posts',
+          blogSidebarCount: 'ALL',
+          postsPerPage: 10,
+          blogTitle: 'ClaraVerse Blog',
+          blogDescription:
+            'Stories, technical deep-dives, and updates from the ClaraVerse team -- building the open-source AI workspace.',
+          feedOptions: {
+            type: ['rss', 'atom'],
+            title: 'ClaraVerse Blog',
+          },
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -66,6 +78,11 @@ const config: Config = {
           sidebarId: 'docsSidebar',
           position: 'left',
           label: 'Docs',
+        },
+        {
+          to: '/blog',
+          label: 'Blog',
+          position: 'left',
         },
         {
           href: 'https://github.com/claraverse/ClaraVerse-Scarlet-OSS',
